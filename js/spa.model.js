@@ -1,1 +1,6 @@
-spa.model = (function(){}());
+spa.model = (function(){
+    return {
+        chat: true,
+        people: true,
+    }
+}());
