@@ -67,7 +67,6 @@ spa.chat = (function(){
         var 
         $append_target = stateMap.$append_target,
         $slider = $append_target.find(".spa-chat");
-
         jqueryMap = {
             $slider : $slider,
             $head : $slider.find('.spa-chat-head'),
@@ -144,7 +143,7 @@ spa.chat = (function(){
     configModule = function (input_map){
         spa.util.setConfigMap({
             input_map : input_map,
-            settable : configMap.settable_map,
+            settable_map : configMap.settable_map,
             config_map : configMap
         });
         return true;

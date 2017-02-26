@@ -10,7 +10,6 @@ spa.util = (function(){
         return error;
     }
     setConfigMap = function( arg_map ){
-        console.log(arg_map);
         var 
         input_map = arg_map.input_map,
         settable_map = arg_map.settable_map,
