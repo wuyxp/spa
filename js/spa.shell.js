@@ -4,6 +4,7 @@ spa.shell = (function(){
         anchor_schema_map: {
             chat: { opened: true, closed: true}
         },
+        resize_interval: 200,
         main_html: ''
         +'    <div class="spa-shell-head">                   '  
         +'        <div class="spa-shell-head-logo"></div>    ' 
@@ -18,7 +19,9 @@ spa.shell = (function(){
         +'    <div class="spa-shell-modal"></div>            ' ,
     },
     stateMap = {
+        $container : undefined,
         anchor_map: {},
+        resize_idto : undefined
     },
     copyAnchorMap,
     changeAnchorPart,
@@ -112,21 +115,36 @@ spa.shell = (function(){
         }
         return false;
     };
+    onResize = function(){
+        if(stateMap.resize_idto){
+            return true;
+        }
+        spa.chat.handleResize();
+        stateMap.resize_idto = setTimeout(
+            function (){
+                stateMap.resize_idto = undefined;
+            },
+            configMap.resize_interval
+        );
+        return false;
+    };
     initModule = function( $container ){
-       stateMap.$container  = $container;
-       $container.html(configMap.main_html);
-       setJqueryMap(); 
-       
-       $.uriAnchor.configModule({
-           schema_map : configMap.anchor_schema_map
-       })
-       spa.chat.configModule({
-           set_chat_anchor: setChatAnchor,
-           chat_model : spa.model.chat,
-           people_model : spa.model.people
-       });
-       spa.chat.initModule(jqueryMap.$container);
-       $(window).bind( 'hashchange', onHashchange ).trigger( 'hashchange' )
+        stateMap.$container  = $container;
+        $container.html(configMap.main_html);
+        setJqueryMap(); 
+
+        $.uriAnchor.configModule({
+            schema_map : configMap.anchor_schema_map
+        })
+        spa.chat.configModule({
+            set_chat_anchor: setChatAnchor,
+            chat_model : spa.model.chat,
+            people_model : spa.model.people
+        });
+        spa.chat.initModule(jqueryMap.$container);
+        $(window)
+            .bind('resize', onResize)
+            .bind( 'hashchange', onHashchange ).trigger( 'hashchange' )
     }
     return {initModule: initModule}
 }())
