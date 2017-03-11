@@ -117,7 +117,7 @@ spa.shell = (function(){
     };
     onResize = function(){
         if(stateMap.resize_idto){
-            return true;
+            return true
         }
         spa.chat.handleResize();
         stateMap.resize_idto = setTimeout(
