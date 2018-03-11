@@ -3,10 +3,14 @@ spa.model = (function(){
         configMap = { anon_id : 'a0' },
         stateMap = {
             anon_user : null,
+            cid_serial: 0,
             people_cid_map : {},
-            people_db : TAFFY()
+            people_db : TAFFY(),
+            user : null
         },
         isFakeData = true,
+        makeCid, clearPeopleDb, completeLogin,
+        removePerson,
         personProto, makePerson, people, initModule;
     personProto = {
         get_is_user : function(){
@@ -15,6 +19,27 @@ spa.model = (function(){
         get_is_anon : function(){
             return this.cid === stateMap.anon_user.cid;
         }
+    };
+    makeCid = function(){
+        return 'c'+String(stateMap.cid_serial++);
+    };
+    clearPeopleDb = function(){
+        var user = stateMap.user;
+        stateMap.people_db = TAFFY();
+        stateMap.people_cid_map = {};
+        if(user){
+            stateMap.people_db.insert(user);
+            stateMap.people_cid_map[user.cid] = user;
+        }
+    };
+    completeLogin = function(user_list){
+        var user_map = user_list[0];
+        delete stateMap.people_cid_map[user_map.cid];
+        stateMap.user.cid = user_map._id;
+        stateMap.user.id = user_map._id;
+        stateMap.user.css_map = user_map.css_map;
+        stateMap.people_cid_map[user_map._id] = stateMap.user;
+        $.gevent.publish('spa-login', [stateMap.user]);
     };
     makePerson = function(person_map){
         var person,
@@ -35,6 +60,17 @@ spa.model = (function(){
         stateMap.people_cid_map[cid] = person;
         stateMap.people_db.insert(person);
         return person;
+    };
+    removePerson = function(){
+        if(!person){return false}
+        if(person.id === configMap.anon_id){
+            return false;
+        }
+        stateMap.people_db({cid: person.cid}).remove();
+        if(person.cid){
+            delete stateMap.people_cid_map[person.cid];
+            return true;
+        }
     };
     people = {
         get_db : function(){return stateMap.people_db},
